@@ -1,0 +1,15 @@
+{
+  "name": "floatify",
+  "version": "0.1.0",
+  "description": "Floating Lyrics overlay prototype",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^30.0.0"
+  },
+  "author": "niveaaa",
+  "license": "MIT"
+}
