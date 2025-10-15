@@ -8,7 +8,7 @@
     "dev": "electron ."
   },
   "devDependencies": {
-    "electron": "^30.0.0"
+    "electron": "^30.5.1"
   },
   "author": "niveaaa",
   "license": "MIT"
