@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "floatify",
   "version": "0.1.0",
   "description": "Floating Lyrics overlay prototype",
@@ -11,5 +12,12 @@
     "electron": "^30.5.1"
   },
   "author": "niveaaa",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "open": "^10.2.0",
+    "request": "^2.88.2"
+  }
 }
