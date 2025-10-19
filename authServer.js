@@ -143,3 +143,7 @@ app.get("/refresh_token", async (req, res) => {
   globalThis.spotifyAccessToken = data.access_token;
   res.json(data);
 });
+
+app.get('/token', (req, res) => {
+  res.json({ access_token: access_token });
+});

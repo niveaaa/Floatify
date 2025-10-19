@@ -3,7 +3,24 @@ const path = require('path');
 const fetch = require('node-fetch');
 
 let mainWindow;
-let accessToken = ''; // you'll pass this from auth or .env
+
+let accessToken = '';
+
+async function updateAccessToken() {
+  try {
+    const res = await fetch('http://127.0.0.1:8888/token');
+    const data = await res.json();
+    accessToken = data.access_token;
+    console.log('Access token updated.');
+  } catch (err) {
+    console.error('Failed to update access token:', err);
+  }
+}
+
+// run once at startup, then every 55 minutes
+updateAccessToken();
+setInterval(updateAccessToken, 55 * 60 * 1000);
+
 
 function createWindow() {
   mainWindow = new BrowserWindow({
