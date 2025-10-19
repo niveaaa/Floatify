@@ -1,71 +1,59 @@
 import express from "express";
-// const express = require('express');
-import request from "request";
-// const request = require('request');
 import cors from "cors";
-// const cors = require('cors');
-import querystring from "querystring";
-// const querystring = require('querystring');
 import open from "open";
-// const open = require('open');
+import dotenv from "dotenv";
 
-import { configDotenv } from "dotenv";
-
-const client_id = process.env.SPOTIFY_CLIENT_ID;
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirect_uri = 'http://127.0.0.1:8888/callback';
-
-console.log(process.env.SPOTIFY_CLIENT_ID);
-
+dotenv.config();
 
 const app = express();
 app.use(cors());
 
+const client_id = process.env.SPOTIFY_CLIENT_ID;
+const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
+const redirect_uri = "http://127.0.0.1:8888/callback";
 
+app.get("/login", (req, res) => {
+  const scopes = "user-read-currently-playing user-read-playback-state";
+  const authUrl = new URL("https://accounts.spotify.com/authorize");
+  authUrl.search = new URLSearchParams({
+    client_id,
+    response_type: "code",
+    redirect_uri,
+    scope: scopes,
+  }).toString();
 
-app.get('/login', (req, res) => {
-  const scope = 'user-read-playback-state user-read-currently-playing';
-
-  const authUrl = 'https://accounts.spotify.com/authorize?' +
-//   const authUrl = 'https://accounts.spotify.com/authorize?client_id=5acf13ea1c4a4f44b0f5b64467e8ba1c&response_type=code&redirect_uri=http://localhost:8888/callback&scope=user-read-playback-state%20user-read-currently-playing' +
-    querystring.stringify({
-      response_type: 'code',
-      client_id,
-      scope,
-      redirect_uri
-    });
-  res.redirect(authUrl);
+  // This line actually sends you to Spotify’s login
+  res.redirect(authUrl.toString());
 });
 
-app.get('/callback', (req, res) => {
-  const code = req.query.code || null;
-  const authOptions = {
-    url: 'https://accounts.spotify.com/api/token',
-    form: {
-      code,
-      redirect_uri,
-      grant_type: 'authorization_code'
-    },
-    headers: {
-      'Authorization': 'Basic ' + Buffer.from(client_id + ':' + client_secret).toString('base64')
-    },
-    json: true
-  };
+app.get("/callback", async (req, res) => {
+  const code = req.query.code;
+  if (!code) {
+    return res.send("Missing authorization code");
+  }
 
-  request.post(authOptions, (error, response, body) => {
-    if (!error && response.statusCode === 200) {
-      const access_token = body.access_token;
-      const refresh_token = body.refresh_token;
-      res.send(`<h2>Login success!</h2><p>Access Token:</p><pre>${access_token}</pre>`);
-      console.log('ACCESS TOKEN:', access_token);
-      console.log('REFRESH TOKEN:', refresh_token);
-    } else {
-      res.send('Auth failed.');
-    }
+  const response = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization:
+        "Basic " +
+        Buffer.from(client_id + ":" + client_secret).toString("base64"),
+    },
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      code: code,
+      redirect_uri: redirect_uri,
+    }),
   });
+
+  const data = await response.json();
+  console.log(data);
+  res.json(data);
 });
 
 app.listen(8888, () => {
-  console.log('Auth server running on http://127.0.0.1:8888/callback');
-  open('http://127.0.0.1:8888/callback');
+  console.log("Auth server running on http://127.0.0.1:8888");
+  // open login page, NOT callback
+  open("http://127.0.0.1:8888/login");
 });
