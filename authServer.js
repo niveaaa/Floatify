@@ -82,3 +82,27 @@ app.get("/currently-playing", async (req, res) => {
   res.json(data);
 });
 
+app.get("/refresh_token", async (req, res) => {
+  const refresh_token = globalThis.spotifyRefreshToken;
+
+  const response = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization:
+        "Basic " +
+        Buffer.from(
+          process.env.SPOTIFY_CLIENT_ID + ":" + process.env.SPOTIFY_CLIENT_SECRET
+        ).toString("base64"),
+    },
+    body: new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refresh_token,
+    }),
+  });
+
+  const data = await response.json();
+  console.log("Refreshed:", data);
+  globalThis.spotifyAccessToken = data.access_token;
+  res.json(data);
+});
