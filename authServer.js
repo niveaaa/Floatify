@@ -26,39 +26,76 @@ app.get("/login", (req, res) => {
     res.redirect(authUrl.toString());
 });
 
+let access_token = null;
+let refresh_token = null;
+let token_expires_in = null;
+
 app.get("/callback", async (req, res) => {
-    const code = req.query.code;
-    if (!code) {
-        return res.send("Missing authorization code");
-    }
+  const code = req.query.code || null;
+  const response = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization:
+        "Basic " +
+        Buffer.from(
+          process.env.SPOTIFY_CLIENT_ID + ":" + process.env.SPOTIFY_CLIENT_SECRET
+        ).toString("base64"),
+    },
+    body: new URLSearchParams({
+      grant_type: "authorization_code",
+      code: code,
+      redirect_uri: "http://127.0.0.1:8888/callback",
+    }),
+  });
 
-    const response = await fetch("https://accounts.spotify.com/api/token", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Authorization:
-                "Basic " +
-                Buffer.from(client_id + ":" + client_secret).toString("base64"),
-        },
-        body: new URLSearchParams({
-            grant_type: "authorization_code",
-            code: code,
-            redirect_uri: redirect_uri,
-        }),
-    });
+  const data = await response.json();
+  console.log("Initial token:", data);
 
-    const data = await response.json();
-    console.log(data);
-    res.json(data);
+  access_token = data.access_token;
+  refresh_token = data.refresh_token;
+  token_expires_in = data.expires_in;
 
-    let access_token = data.access_token;
-    let refresh_token = data.refresh_token;
+  // Schedule auto-refresh 1 minute before expiry
+  scheduleTokenRefresh(token_expires_in - 60);
 
-    // Save these somewhere — e.g., in memory for now
-    globalThis.spotifyAccessToken = access_token;
-    globalThis.spotifyRefreshToken = refresh_token;
-
+  res.send("Authenticated! You can close this tab.");
 });
+
+// --- REFRESH LOGIC ---
+async function refreshAccessToken() {
+  console.log("Refreshing access token...");
+  const response = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization:
+        "Basic " +
+        Buffer.from(
+          process.env.SPOTIFY_CLIENT_ID + ":" + process.env.SPOTIFY_CLIENT_SECRET
+        ).toString("base64"),
+    },
+    body: new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refresh_token,
+    }),
+  });
+
+  const data = await response.json();
+  console.log("Refreshed token:", data);
+
+  access_token = data.access_token;
+  token_expires_in = data.expires_in;
+
+  // reschedule refresh
+  scheduleTokenRefresh(token_expires_in - 60);
+}
+
+function scheduleTokenRefresh(seconds) {
+  setTimeout(refreshAccessToken, seconds * 1000);
+  console.log(`Scheduled next refresh in ${seconds / 60} minutes.`);
+}
+
 
 app.listen(8888, () => {
     console.log("Auth server running on http://127.0.0.1:8888");
@@ -67,7 +104,7 @@ app.listen(8888, () => {
 });
 
 app.get("/currently-playing", async (req, res) => {
-  const token = globalThis.spotifyAccessToken;
+  const token = access_token;
 
   const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
     headers: { Authorization: `Bearer ${token}` },
