@@ -3,7 +3,7 @@
   "name": "floatify",
   "version": "0.1.0",
   "description": "Floating Lyrics overlay prototype",
-  "main": "main.js",
+  "main": "main.cjs",
   "scripts": {
     "start": "electron .",
     "dev": "electron ."

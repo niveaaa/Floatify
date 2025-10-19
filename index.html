@@ -1,44 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Floatify — Prototype</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline';">
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="overlay">
-      <div id="header" class="drag">
-        <div id="title">Floatify</div>
-        <div id="controls" class="no-drag">
-          <button id="min-btn" title="Minimize">—</button>
-          <button id="close-btn" title="Close">✕</button>
-        </div>
-      </div>
-
-      <div id="content">
-        <div id="lyrics">
-          <div class="line">[00:00] This is a demo lyric line.</div>
-          <div class="line current">[00:04] We float above your windows.</div>
-          <div class="line">[00:08] Multitask, pretend you're studying.</div>
-        </div>
-
-        <div id="toolbar" class="no-drag">
-          <div class="left">
-            <button id="play">▶</button>
-            <button id="pause">⏸</button>
-            <button id="skip">⏭</button>
-          </div>
-
-          <div class="right">
-            <label>Opacity</label>
-            <input id="opacity" type="range" min="0.2" max="1" step="0.05" value="0.85" />
-            <label class="ct-label"><input type="checkbox" id="clickthrough" /> Click-through</label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <script src="renderer.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <title>Floatify</title>
+  <style>
+    body {
+      background: #111;
+      color: #1DB954;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    img {
+      border-radius: 10px;
+      margin-top: 20px;
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="track">Loading...</h1>
+  <h3 id="artist"></h3>
+  <img id="albumArt" src="" alt="">
+  <script src="renderer.js"></script>
+</body>
 </html>
