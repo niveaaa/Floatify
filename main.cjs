@@ -25,10 +25,10 @@ setInterval(updateAccessToken, 55 * 60 * 1000);
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 400,
-    height: 150,
+    height: 250,                // more height to fit track, artist, and album art
     frame: false,
-    transparent: true,         // makes the window background transparent
-    alwaysOnTop: true,         // stays above other windows
+    transparent: true,
+    alwaysOnTop: true,
     resizable: false,
     hasShadow: false,
     skipTaskbar: true,
@@ -38,9 +38,15 @@ function createWindow() {
   });
 
   mainWindow.loadFile('index.html');
-  mainWindow.setIgnoreMouseEvents(false); // still clickable; true makes it click-through
+
+  // remove scrollbar artifacts
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.insertCSS('body { overflow: hidden !important; }');
+  });
+
   mainWindow.setAlwaysOnTop(true, 'floating');
 }
+
 
 app.whenReady().then(createWindow);
 
