@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fetch = require('node-fetch');
 
+const { screen } = require('electron');
+
 let mainWindow;
 
 let accessToken = '';
@@ -23,9 +25,13 @@ setInterval(updateAccessToken, 55 * 60 * 1000);
 
 
 function createWindow() {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+
   mainWindow = new BrowserWindow({
-    width: 400,
+    width: 300,
     height: 250,                // more height to fit track, artist, and album art
+    x: width - 320,  // near bottom-right
+    y: height - 280,
     frame: false,
     transparent: true,
     alwaysOnTop: true,

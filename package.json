@@ -1,6 +1,7 @@
 {
   "type": "module",
   "name": "floatify",
+  "productName": "Floatify",
   "version": "0.1.0",
   "description": "Floating Lyrics overlay prototype",
   "main": "main.cjs",
@@ -9,7 +10,8 @@
     "dev": "electron ."
   },
   "devDependencies": {
-    "electron": "^30.5.1"
+    "electron": "^30.5.1",
+    "electron-packager": "^17.1.2"
   },
   "author": "niveaaa",
   "license": "MIT",
