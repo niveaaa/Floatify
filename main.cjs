@@ -31,9 +31,9 @@ function createWindow() {
 
   mainWindow = new BrowserWindow({
     width: 300,
-    height: 250,                // more height to fit track, artist, and album art
+    height: 550,                // more height to fit track, artist, and album art
     x: width - 320,  // near bottom-right
-    y: height - 280,
+    y: height - 580,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
