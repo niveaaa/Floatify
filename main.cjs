@@ -45,6 +45,8 @@ function createWindow() {
     },
   });
 
+  mainWindow.setIgnoreMouseEvents(true, { forward: true });
+  
   mainWindow.loadFile('index.html');
 
   // remove scrollbar artifacts
