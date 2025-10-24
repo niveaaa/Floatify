@@ -70,16 +70,18 @@ setInterval(async () => {
     if (res.status === 204) return; // no track playing
     const data = await res.json();
 
-    const lyrics = await getLyrics(data.item?.name, data.item?.artists?.[0]?.name);
-    console.log(lyrics);
+    // const lyrics = await getLyrics(data.item?.name, data.item?.artists?.[0]?.name);
+    // console.log(lyrics);
 
     if (mainWindow && mainWindow.webContents) {
+      const lyrics = await getLyrics(data.item?.name, data.item?.artists?.[0]?.name);
       mainWindow.webContents.send('update-track', {
         name: data.item?.name,
         artist: data.item?.artists?.map(a => a.name).join(', '),
         albumArt: data.item?.album?.images[0]?.url,
-        lyrics: await getLyrics(data.item?.name, data.item?.artists[0]?.name)
+        lyrics
       });
+      //console.log(lyrics);
     }
   } catch (err) {
     console.error(err);
