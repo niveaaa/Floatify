@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fetch = require('node-fetch');
+const { getLyrics } = require('./lyrics.cjs');
+require('dotenv').config();
 
 const { screen } = require('electron');
 
@@ -68,11 +70,15 @@ setInterval(async () => {
     if (res.status === 204) return; // no track playing
     const data = await res.json();
 
+    const lyrics = await getLyrics(data.item?.name, data.item?.artists?.[0]?.name);
+    console.log(lyrics);
+
     if (mainWindow && mainWindow.webContents) {
       mainWindow.webContents.send('update-track', {
         name: data.item?.name,
         artist: data.item?.artists?.map(a => a.name).join(', '),
-        albumArt: data.item?.album?.images[0]?.url
+        albumArt: data.item?.album?.images[0]?.url,
+        lyrics: await getLyrics(data.item?.name, data.item?.artists[0]?.name)
       });
     }
   } catch (err) {
